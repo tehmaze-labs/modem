@@ -1,16 +1,30 @@
 import os
 import select
+import shutil
 import subprocess
 import sys
 import StringIO
 import tempfile
-from xmodem import XMODEM
+from xmodem import *
 
-if __name__ == '__main__':
-    fd, fn = tempfile.mkstemp()
-    pipe   = subprocess.Popen(['rx', '--xmodem', fn], 
-                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    si, so = (pipe.stdin, pipe.stdout)
+def run(modem='XMODEM'):
+    print 'Testing', modem.upper(), 'modem'
+
+    fn = None
+    if modem.lower().startswith('xmodem'):
+        fd, fn = tempfile.mkstemp()
+        flag   = '--xmodem'
+        print 'Calling rz %s %s' % (flag, fn)
+        pipe   = subprocess.Popen(['rz', '--errors', '1200', '-p', flag, fn],
+                     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        si, so = (pipe.stdin, pipe.stdout)
+
+    elif modem.lower() == 'ymodem':
+        flag   = '--ymodem'
+        print 'Calling rz %s' % (flag,)
+        pipe   = subprocess.Popen(['rz', '--errors', '1200', '-p', flag],
+                     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        si, so = (pipe.stdin, pipe.stdout)
 
     def getc(size, timeout=3):
         w,t,f = select.select([so], [], [], timeout)
@@ -34,15 +48,31 @@ if __name__ == '__main__':
         print 'putc(', repr(data), repr(size), ')'
         return size
 
-    stream = open(__file__, 'rb')
-    xmodem = XMODEM(getc, putc)
-    status = xmodem.send(stream, retry=8)
-    stream.close()
+    if modem.lower().startswith('xmodem'):
+        stream = open(__file__, 'rb')
+        xmodem = globals()[modem.upper()](getc, putc)
+        print 'Modem instance', xmodem
+        status = xmodem.send(stream, retry=8)
+        stream.close()
+
+    elif modem.lower() == 'ymodem':
+        fd, fn = tempfile.mkstemp()
+        shutil.copy(__file__, fn)
+        ymodem = YMODEM(getc, putc)
+        print 'Modem instance', ymodem
+        status = ymodem.send(fn, retry=8)
 
     print >> sys.stderr, 'sent', status
     print >> sys.stderr, file(fn).read()
 
-    os.unlink(fn)
+    if fn: os.unlink(fn)
 
-    sys.exit(int(not status))
+    return int(not status)
 
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        for modem in sys.argv[1:]:
+            run(modem.upper())
+    else:
+        for modem in ['XMODEM', 'YMODEM']:
+            run(modem)
