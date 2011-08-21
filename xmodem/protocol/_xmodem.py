@@ -195,13 +195,13 @@ class XMODEM(object):
         '''
         return (sum(map(ord, data)) + checksum) % 256
 
-    def calc_crc(self, data, crc=0):
+    def calc_crc16(self, data, crc=0):
         '''
-        Calculate the Cyclic Redundancy Check for a given block of data, can
-        also be used to update a CRC.
+        Calculate the 16 bit Cyclic Redundancy Check for a given block of data,
+        can also be used to update a CRC.
 
-            >>> crc = modem.calc_crc('hello')
-            >>> crc = modem.calc_crc('world', crc)
+            >>> crc = modem.calc_crc16('hello')
+            >>> crc = modem.calc_crc16('world', crc)
             >>> hex(crc)
             '0xd5e3'
 
@@ -209,6 +209,21 @@ class XMODEM(object):
         for char in data:
             crc = (crc << 8) ^ CRC16_MAP[((crc >> 8) ^ ord(char)) & 0xff]
         return crc & 0xffff
+
+    def calc_crc32(self, data, crc=0):
+        '''
+        Calculate the 32 bit Cyclic Redundancy Check for a given block of data,
+        can also be used to update a CRC.
+
+            >>> crc = modem.calc_crc32('hello')
+            >>> crc = modem.calc_crc32('world', crc)
+            >>> hex(crc)
+            '0x1a6148db'
+
+        '''
+        for char in data:
+            crc = CRC32_MAP[(ord(char) ^ crc) & 0xff] ^ ((crc >> 8)) & 0x00ffffff
+        return crc
 
     def _check_crc(self, data, crc_mode):
         '''
@@ -226,7 +241,7 @@ class XMODEM(object):
         if crc_mode:
             csum = (ord(data[-2]) << 8) + ord(data[-1])
             data = data[:-2]
-            mine = self.calc_crc(data)
+            mine = self.calc_crc16(data)
             if csum == mine:
                 return data
         else:
@@ -270,7 +285,7 @@ class XMODEM(object):
             data = data.ljust(packet_size, '\x00')
 
             # Calculate CRC or checksum
-            crc = crc_mode and self.calc_crc(data) or self.calc_checksum(data)
+            crc = crc_mode and self.calc_crc16(data) or self.calc_checksum(data)
 
             # SENDS PACKET WITH CRC
             if not self._send_packet(sequence, data, packet_size, crc_mode, crc,
