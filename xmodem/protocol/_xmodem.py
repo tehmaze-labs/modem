@@ -207,7 +207,7 @@ class XMODEM(object):
 
         '''
         for char in data:
-            crc = (crc << 8) ^ CRC_MAP[((crc >> 8) ^ ord(char)) & 0xff]
+            crc = (crc << 8) ^ CRC16_MAP[((crc >> 8) ^ ord(char)) & 0xff]
         return crc & 0xffff
 
     def _check_crc(self, data, crc_mode):
