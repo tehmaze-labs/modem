@@ -1,6 +1,0 @@
-syntax: glob
-*.pyc
-*.swp
-build
-dist
-xmodem.egg-info
