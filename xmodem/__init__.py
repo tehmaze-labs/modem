@@ -11,6 +11,7 @@ from xmodem.protocol._xmodem import XMODEM
 from xmodem.protocol._xmodem1k import XMODEM1K
 from xmodem.protocol._xmodemcrc import XMODEMCRC
 from xmodem.protocol._ymodem import YMODEM
+from xmodem.protocol._zmodem import ZMODEM
 
 gettext.install('xmodem')
 
@@ -20,5 +21,6 @@ __all__ = [
     'XMODEM1K',
     'XMODEMCRC',
     'YMODEM',
+    'ZMODEM',
 ]
 
