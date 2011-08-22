@@ -1,11 +1,14 @@
 # Protocol bytes
-SOH = chr(0x01)
-STX = chr(0x02)
-EOT = chr(0x04)
-ACK = chr(0x06)
-NAK = chr(0x15)
-CAN = chr(0x18)
-CRC = chr(0x43)
+SOH  = chr(0x01)
+STX  = chr(0x02)
+EOT  = chr(0x04)
+ENQ  = chr(0x05)
+ACK  = chr(0x06)
+XON  = chr(0x11)
+XOFF = chr(0x13)
+NAK  = chr(0x15)
+CAN  = chr(0x18)
+CRC  = chr(0x43)
 
 # Protocol types
 PROTOCOL_XMODEM    = 0x00
