@@ -1,10 +1,11 @@
 import time
 from xmodem import error
+from xmodem.base import MODEM
 from xmodem.const import *
 from xmodem.tools import log
 
 
-class XMODEM(object):
+class XMODEM(MODEM):
     '''
     XMODEM Protocol handler, expects an object to read from and an object to
     write to.
@@ -21,10 +22,6 @@ class XMODEM(object):
 
     # Protocol identifier
     protocol = PROTOCOL_XMODEM
-
-    def __init__(self, getc, putc):
-        self.getc = getc
-        self.putc = putc
 
     def abort(self, count=2, timeout=60):
         '''
@@ -181,76 +178,6 @@ class XMODEM(object):
 
             # something went wrong, request retransmission
             self.putc(NAK)
-
-    def calc_checksum(self, data, checksum=0):
-        '''
-        Calculate the checksum for a given block of data, can also be used to
-        update a checksum.
-
-            >>> csum = modem.calc_checksum('hello')
-            >>> csum = modem.calc_checksum('world', csum)
-            >>> hex(csum)
-            '0x3c'
-
-        '''
-        return (sum(map(ord, data)) + checksum) % 256
-
-    def calc_crc16(self, data, crc=0):
-        '''
-        Calculate the 16 bit Cyclic Redundancy Check for a given block of data,
-        can also be used to update a CRC.
-
-            >>> crc = modem.calc_crc16('hello')
-            >>> crc = modem.calc_crc16('world', crc)
-            >>> hex(crc)
-            '0xd5e3'
-
-        '''
-        for char in data:
-            crc = (crc << 8) ^ CRC16_MAP[((crc >> 8) ^ ord(char)) & 0xff]
-        return crc & 0xffff
-
-    def calc_crc32(self, data, crc=0):
-        '''
-        Calculate the 32 bit Cyclic Redundancy Check for a given block of data,
-        can also be used to update a CRC.
-
-            >>> crc = modem.calc_crc32('hello')
-            >>> crc = modem.calc_crc32('world', crc)
-            >>> hex(crc)
-            '0x1a6148db'
-
-        '''
-        for char in data:
-            crc = CRC32_MAP[(ord(char) ^ crc) & 0xff] ^ ((crc >> 8)) & 0x00ffffff
-        return crc
-
-    def _check_crc(self, data, crc_mode):
-        '''
-        Depending on crc_mode check CRC or checksum on data.
-
-            >>> data = self._check_crc(data,crc_mode,quiet=quiet,debug=debug)
-            >>> if data:
-            >>>    income_size += len(data)
-            >>>    stream.write(data)
-            ...
-
-        In case the control code is valid returns data without checksum/CRC,
-        or returns False in case of invalid checksum/CRC
-        '''
-        if crc_mode:
-            csum = (ord(data[-2]) << 8) + ord(data[-1])
-            data = data[:-2]
-            mine = self.calc_crc16(data)
-            if csum == mine:
-                return data
-        else:
-            csum = ord(data[-3])
-            data = data[:-1]
-            mine = self.calc_checksum(data)
-            if csum == mine:
-                return data
-        return False
 
     def _send_stream(self, stream, crc_mode, retry=16, timeout=0):
         '''
