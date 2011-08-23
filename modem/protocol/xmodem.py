@@ -7,8 +7,8 @@ from modem.tools import log
 
 class XMODEM(Modem):
     '''
-    XMODEM Protocol handler, expects an object to read from and an object to
-    write to.
+    XMODEM protocol implementation, expects an object to read from and an object
+    to write to.
 
     >>> def getc(size, timeout=1):
     ...     return data or None

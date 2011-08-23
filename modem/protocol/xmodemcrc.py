@@ -5,17 +5,8 @@ from modem.protocol.xmodem import XMODEM
 
 class XMODEMCRC(XMODEM):
     '''
-    XMODEMCRC Protocol handler, expects an object to read from and an object to 
-    write to.
-
-    >>> def getc(size, timeout=1):
-    ...     return data or None
-    ...
-    >>> def putc(data, timeout=1):
-    ...     return size or None
-    ...
-    >>> modem = XMODEMCRC(getc, putc)
-
+    XMODEMCRC protocol implementation, expects an object to read from and an
+    object to write to.
     '''
 
     # Protocol identifier

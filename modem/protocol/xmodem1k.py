@@ -5,6 +5,11 @@ from modem.protocol.xmodem import XMODEM
 
 
 class XMODEM1K(XMODEM):
+    '''
+    XMODEM1K protocol implementation, expects an object to read from and an
+    object to write to.
+    '''
+
     protocol = PROTOCOL_XMODEM1K
 
     def send(self, stream, retry=16, timeout=60):

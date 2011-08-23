@@ -7,7 +7,25 @@ from modem.tools import log
 
 
 class ZMODEM(Modem):
-    def recv(self, basedir, timeout=5, retry=10):
+    '''
+    ZMODEM protocol implementation, expects an object to read from and an object
+    to write to.
+    '''
+
+    def recv(self, basedir, retry=16, timeout=60, delay=1):
+        '''
+        Receive some files via the ZMODEM protocol and place them under
+        ``basedir``::
+
+            >>> print modem.recv(basedir)
+            3
+
+        Returns the number of files received on success or ``None`` in case of
+        failure.
+
+        N.B.: currently there are no control on the existence of files, so they
+        will be silently overwritten.
+        '''
         # Loop until we established a connection, we expect to receive a
         # different packet than ZRQINIT
         kind = TIMEOUT

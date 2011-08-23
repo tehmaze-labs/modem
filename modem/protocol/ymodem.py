@@ -7,17 +7,8 @@ from modem.protocol.xmodem import XMODEM
 
 class YMODEM(XMODEM):
     '''
-    YMODEM Protocol handler, expects an object to read from and an object to 
-    write to.
-
-    >>> def getc(size, timeout=1):
-    ...     return data or None
-    ...
-    >>> def putc(data, timeout=1):
-    ...     return size or None
-    ...
-    >>> modem = YMODEM(getc, putc)
-
+    YMODEM protocol implementation, expects an object to read from and an object
+    to write to.
     '''
 
     def __init__(self, getc, putc):
@@ -123,18 +114,18 @@ class YMODEM(XMODEM):
 
     def recv(self, basedir, crc_mode=1, retry=16, timeout=60, delay=1):
         '''
-        Receive some files via the YMODEM protocol and place them under basedir.
+        Receive some files via the YMODEM protocol and place them under
+        ``basedir``::
 
             >>> print modem.recv(basedir)
             3
 
-        Returns the number of file received on success or ``None`` in case of
+        Returns the number of files received on success or ``None`` in case of
         failure.
 
-        N.B: currently there are no control on the existence of files, so they
+        N.B.: currently there are no control on the existence of files, so they
         will be silently overwritten.
         '''
-
         # Initiate protocol
         error_count = 0
         char = 0
