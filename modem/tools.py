@@ -1,5 +1,5 @@
 import logging
-from xmodem.const import CRC16_MAP, CRC32_MAP
+from modem.const import CRC16_MAP, CRC32_MAP
 from zlib import crc32 as _crc32
 
 

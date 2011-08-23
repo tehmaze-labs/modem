@@ -7,7 +7,7 @@ import subprocess
 import sys
 import StringIO
 import tempfile
-from xmodem import *
+from modem import *
 
 def run(modem='xmodem'):
 
@@ -26,8 +26,12 @@ def run(modem='xmodem'):
         stream = StringIO.StringIO()
 
     elif modem.lower() == 'zmodem':
-        #pipe   = subprocess.Popen(['zmtx', '-d', '-v', __file__],
-        pipe   = subprocess.Popen(['sz', '--zmodem'] + list(glob.glob('test/*.py')),
+        if len(sys.argv) > 2:
+            files = sys.argv[2:]
+        else:
+            files = [__file__]
+        #pipe   = subprocess.Popen(['zmtx', '-d', '-v'] + files,
+        pipe   = subprocess.Popen(['sz', '--zmodem', '--try-8k'] + files,
                      stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         si, so = (pipe.stdin, pipe.stdout)
 
@@ -40,7 +44,7 @@ def run(modem='xmodem'):
         else:
             data = None
 
-        print datetime.datetime.now(), 'getc(', repr(data), ')'
+        #print datetime.datetime.now(), 'getc(', repr(data), ')'
         return data
 
     def putc(data, timeout=3):
@@ -52,7 +56,7 @@ def run(modem='xmodem'):
         else:
             size = None
 
-        print datetime.datetime.now(), 'putc(', repr(data), repr(size), ')'
+        #print datetime.datetime.now(), 'putc(', repr(data), repr(size), ')'
         return size
 
     if modem.lower().startswith('xmodem'):
@@ -76,6 +80,8 @@ def run(modem='xmodem'):
         nfiles = ymodem.recv(basedr, retry=8)
         print >> sys.stderr, 'received', nfiles, 'files in', basedr
         print >> sys.stderr, subprocess.Popen(['ls', '-al', basedr],
+            stdout=subprocess.PIPE).communicate()[0]
+        print >> sys.stderr, subprocess.Popen(['md5'] + glob.glob(basedr+'/*'),
             stdout=subprocess.PIPE).communicate()[0]
         shutil.rmtree(basedr)
 

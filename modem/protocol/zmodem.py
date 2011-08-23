@@ -1,12 +1,12 @@
 import datetime
 import os
 import time
-from xmodem.base import MODEM
-from xmodem.const import *
-from xmodem.tools import log
+from modem.base import Modem
+from modem.const import *
+from modem.tools import log
 
 
-class ZMODEM(MODEM):
+class ZMODEM(Modem):
     def recv(self, basedir, timeout=5, retry=10):
         # Loop until we established a connection, we expect to receive a
         # different packet than ZRQINIT

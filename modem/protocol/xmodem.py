@@ -1,11 +1,11 @@
 import time
-from xmodem import error
-from xmodem.base import MODEM
-from xmodem.const import *
-from xmodem.tools import log
+from modem import error
+from modem.base import Modem
+from modem.const import *
+from modem.tools import log
 
 
-class XMODEM(MODEM):
+class XMODEM(Modem):
     '''
     XMODEM Protocol handler, expects an object to read from and an object to
     write to.

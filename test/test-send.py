@@ -5,7 +5,7 @@ import subprocess
 import sys
 import StringIO
 import tempfile
-from xmodem import *
+from modem import *
 
 def run(modem='XMODEM'):
     print 'Testing', modem.upper(), 'modem'

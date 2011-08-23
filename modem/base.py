@@ -1,8 +1,8 @@
-from xmodem.const import CRC16_MAP, CRC32_MAP
-from xmodem.tools import crc16, crc32
+from modem.const import CRC16_MAP, CRC32_MAP
+from modem.tools import crc16, crc32
 
 
-class MODEM(object):
+class Modem(object):
     def __init__(self, getc, putc):
         self.getc = getc
         self.putc = putc
