@@ -58,7 +58,6 @@ class XMODEM1K(XMODEM):
             log.error(error.ABORT_SEND_STREAM)
             return False
 
-
     def recv(self, stream, crc_mode=1, retry=16, timeout=60, delay=1):
         '''
         Receive a stream via the XMODEM1K protocol.
@@ -149,15 +148,15 @@ class XMODEM1K(XMODEM):
             if seq1 == sequence and seq2 == sequence:
                 # sequence is ok, read packet
                 # packet_size + checksum
-                data = self.getc(packet_size + 1 + crc_mode) 
-                data = self._check_crc(data,crc_mode,quiet=quiet,debug=debug)
+                data = self.getc(packet_size + 1 + crc_mode)
+                data = self._check_crc(data, crc_mode)
                 # valid data, append chunk
                 if data:
                     income_size += len(data)
                     stream.write(data)
                     self.putc(ACK)
                     sequence = (sequence + 1) % 0x100
-                    char = self.getc(1, timeout) 
+                    char = self.getc(1, timeout)
                     continue
             else:
                 # consume data

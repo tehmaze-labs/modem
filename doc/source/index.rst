@@ -5,12 +5,16 @@
 
 .. include:: about.rst
 
-Contents:
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
 
+   about
    modem
+   modem/const
+   modem/tools
 
 Indices and tables
 ==================

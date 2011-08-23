@@ -1,103 +1,381 @@
-# XMODEM Protocol bytes
-SOH  = chr(0x01)
-STX  = chr(0x02)
-EOT  = chr(0x04)
-ENQ  = chr(0x05)
-ACK  = chr(0x06)
-XON  = chr(0x11)
-XOFF = chr(0x13)
-NAK  = chr(0x15)
-CAN  = chr(0x18)
-CRC  = chr(0x43)
+'''
+XMODEM Protocol bytes
+=====================
 
-# ZMODEM Protocol bytes
+.. data:: SOH
+
+   Indicates a packet length of 128 (X/Y)
+
+.. data:: STX
+
+   Indicates a packet length of 1024 (X/Y)
+
+.. data:: EOT
+
+   End of transmission (X/Y)
+
+.. data:: ACK
+
+   Acknowledgement (X/Y)
+
+.. data:: XON
+
+   Enable out of band flow control (Z)
+
+.. data:: XOFF
+
+   Disable out of band flow control (Z)
+
+.. data:: NAK
+
+   Negative acknowledgement (X/Y)
+
+.. data:: CAN
+
+   Cancel (X/Y)
+
+.. data:: CRC
+
+   Cyclic redundancy check (X/Y)
+
+
+ZMODEM Protocol bytes
+=====================
+
+.. data:: TIMEOUT
+
+   Timeout or invalid data.
+
+.. data:: ZPAD
+
+   Pad character; frame begins
+
+.. data:: ZDLE
+
+   Escape sequence
+
+.. data:: ZDLEE
+
+   Escaped ``ZDLE``
+
+.. data:: ZBIN, ZVBIN
+
+   Binary frame indicator (using CRC16)
+
+.. data:: ZHEX, ZVHEX
+
+   Hex frame indicator (using CRC16)
+
+.. data:: ZBIN32, ZVBIN32
+
+   Binary frame indicator (using CRC32)
+
+.. data:: ZBINR32, ZVBINR32
+
+   Run length encoded binary frame (using CRC32)
+
+.. data:: ZRESC
+
+   Run length encoding flag or escape character
+
+
+ZMODEM Frame types
+==================
+
+.. data:: ZRQINIT
+
+   Request receive init (s->r)
+
+.. data:: ZRINIT
+
+   Receive init (r->s)
+
+.. data:: ZSINIT
+
+   Send init sequence (optional) (s->r)
+
+.. data:: ZACK
+
+   Ack to ZRQINIT ZRINIT or ZSINIT (s<->r)
+
+.. data:: ZFILE
+
+   File name (s->r)
+
+.. data:: ZSKIP
+
+   Skip this file (r->s)
+
+.. data:: ZNAK
+
+   Last packet was corrupted (?)
+
+.. data:: ZABORT
+
+   Abort batch transfers (?)
+
+.. data:: ZFIN
+
+   Finish session (s<->r)
+
+.. data:: ZRPOS
+
+   Resume data transmission here (r->s)
+
+.. data:: ZDATA
+
+   Data packet(s) follow (s->r)
+
+.. data:: ZEOF
+
+   End of file reached (s->r)
+
+.. data:: ZFERR
+
+   Fatal read or write error detected (?)
+
+.. data:: ZCRC
+
+   Request for file CRC and response (?)
+
+.. data:: ZCHALLENGE
+
+   Security challenge (r->s)
+
+.. data:: ZCOMPL
+
+   Request is complete (?)
+
+.. data:: ZCAN
+
+   Pseudo frame; other end cancelled session with 5* CAN
+
+.. data:: ZFREECNT
+
+   Request free bytes on file system (s->r)
+
+.. data:: ZCOMMAND
+
+   Issue command (s->r)
+
+.. data:: ZSTDERR
+
+   Output data to stderr (??)
+
+
+ZMODEM ZDLE sequences
+=====================
+
+.. data:: ZCRCE
+
+   CRC next, frame ends, header packet follows
+
+.. data:: ZCRCG
+
+   CRC next, frame continues nonstop
+
+.. data:: ZCRCQ
+
+   CRC next, frame continuous, ZACK expected
+
+.. data:: ZCRCW
+
+   CRC next, ZACK expected, end of frame
+
+.. data:: ZRUB0
+
+   Translate to rubout 0x7f
+
+.. data:: ZRUB1
+
+   Translate to rubout 0xff
+
+
+ZMODEM receiver capability flags
+================================
+
+.. data:: CANFDX
+
+   Receiver can send and receive true full duplex
+
+.. data:: CANOVIO
+
+   Receiver can receive data during disk I/O
+
+.. data:: CANBRK
+
+   Receiver can send a break signal
+
+.. data:: CANCRY
+
+   Receiver can decrypt
+
+.. data:: CANLZW
+
+   Receiver can uncompress
+
+.. data:: CANFC32
+
+   Receiver can use 32 bit Frame Check
+
+.. data:: ESCCTL
+
+   Receiver expects ctl chars to be escaped
+
+.. data:: ESC8
+
+   Receiver expects 8th bit to be escaped
+
+
+ZMODEM ZRINIT frame
+===================
+
+.. data:: ZF0_CANFDX
+
+   Receiver can send and receive true full duplex
+
+.. data:: ZF0_CANOVIO
+
+   Receiver can receive data during disk I/O
+
+.. data:: ZF0_CANBRK
+
+   Receiver can send a break signal
+
+.. data:: ZF0_CANCRY
+
+   Receiver can decrypt DONT USE
+
+.. data:: ZF0_CANLZW
+
+   Receiver can uncompress DONT USE
+
+.. data:: ZF0_CANFC32
+
+   Receiver can use 32 bit Frame Check
+
+.. data:: ZF0_ESCCTL
+
+   Receiver expects ctl chars to be escaped
+
+.. data:: ZF0_ESC8
+
+   Receiver expects 8th bit to be escaped
+
+.. data:: ZF1_CANVHDR
+
+   Variable headers OK
+
+ZMODEM ZSINIT frame
+===================
+
+.. data:: ZF0_TESCCTL
+
+   Transmitter expects ctl chars to be escaped
+
+.. data:: ZF0_TESC8
+
+   Transmitter expects 8th bit to be escaped
+
+'''
+
+SOH         = chr(0x01)
+STX         = chr(0x02)
+EOT         = chr(0x04)
+ACK         = chr(0x06)
+XON         = chr(0x11)
+XOFF        = chr(0x13)
+NAK         = chr(0x15)
+CAN         = chr(0x18)
+CRC         = chr(0x43)
+
 TIMEOUT     = None
-ZPAD        = 0x2a # pad character; begins frames
-ZDLE        = 0x18 # ctrl-x zmodem escape
-ZDLEE       = 0x58 # escaped ZDLE
-ZBIN        = 0x41 # binary frame indicator (CRC16)
-ZHEX        = 0x42 # hex frame indicator
-ZBIN32      = 0x43 # binary frame indicator (CRC32)
-ZBINR32     = 0x44 # run length encoded binary frame (CRC32)
-ZVBIN       = 0x61 # binary frame indicator (CRC16)
-ZVHEX       = 0x62 # hex frame indicator
-ZVBIN32     = 0x63 # binary frame indicator (CRC32)
-ZVBINR32    = 0x64 # run length encoded binary frame (CRC32)
-ZRESC       = 0x7e # Run length encoding flag / escape character
+ZPAD        = 0x2a
+ZDLE        = 0x18
+ZDLEE       = 0x58
+ZBIN        = 0x41
+ZHEX        = 0x42
+ZBIN32      = 0x43
+ZBINR32     = 0x44
+ZVBIN       = 0x61
+ZVHEX       = 0x62
+ZVBIN32     = 0x63
+ZVBINR32    = 0x64
+ZRESC       = 0x7e
 
 # ZMODEM Frame types
-ZRQINIT     = 0x00 # request receive init (s->r) 
-ZRINIT      = 0x01 # receive init (r->s) 
-ZSINIT      = 0x02 # send init sequence (optional) (s->r) 
-ZACK        = 0x03 # ack to ZRQINIT ZRINIT or ZSINIT (s<->r) 
-ZFILE       = 0x04 # file name (s->r) 
-ZSKIP       = 0x05 # skip this file (r->s) 
-ZNAK        = 0x06 # last packet was corrupted (?) 
-ZABORT      = 0x07 # abort batch transfers (?) 
-ZFIN        = 0x08 # finish session (s<->r) 
-ZRPOS       = 0x09 # resume data transmission here (r->s) 
-ZDATA       = 0x0a # data packet(s) follow (s->r) 
-ZEOF        = 0x0b # end of file reached (s->r) 
-ZFERR       = 0x0c # fatal read or write error detected (?) 
-ZCRC        = 0x0d # request for file CRC and response (?) 
-ZCHALLENGE  = 0x0e # security challenge (r->s) 
-ZCOMPL      = 0x0f # request is complete (?) 
-ZCAN        = 0x10 # pseudo frame; other end cancelled session with 5* CAN 
-ZFREECNT    = 0x11 # request free bytes on file system (s->r) 
-ZCOMMAND    = 0x12 # issue command (s->r) 
-ZSTDERR     = 0x13 # output data to stderr (??) 
+ZRQINIT     = 0x00
+ZRINIT      = 0x01
+ZSINIT      = 0x02
+ZACK        = 0x03
+ZFILE       = 0x04
+ZSKIP       = 0x05
+ZNAK        = 0x06
+ZABORT      = 0x07
+ZFIN        = 0x08
+ZRPOS       = 0x09
+ZDATA       = 0x0a
+ZEOF        = 0x0b
+ZFERR       = 0x0c
+ZCRC        = 0x0d
+ZCHALLENGE  = 0x0e
+ZCOMPL      = 0x0f
+ZCAN        = 0x10
+ZFREECNT    = 0x11
+ZCOMMAND    = 0x12
+ZSTDERR     = 0x13
 
 # ZMODEM ZDLE sequences
-ZCRCE       = 0x68 # CRC next, frame ends, header packet follows 
-ZCRCG       = 0x69 # CRC next, frame continues nonstop 
-ZCRCQ       = 0x6a # CRC next, frame continuous, ZACK expected 
-ZCRCW       = 0x6b # CRC next, ZACK expected, end of frame 
-ZRUB0       = 0x6c # translate to rubout 0x7f 
-ZRUB1       = 0x6d # translate to rubout 0xff 
+ZCRCE       = 0x68
+ZCRCG       = 0x69
+ZCRCQ       = 0x6a
+ZCRCW       = 0x6b
+ZRUB0       = 0x6c
+ZRUB1       = 0x6d
 
 # ZMODEM Receiver capability flags
-CANFDX      = 0x01 # Rx can send and receive true full duplex 
-CANOVIO     = 0x02 # Rx can receive data during disk I/O 
-CANBRK      = 0x04 # Rx can send a break signal 
-CANCRY      = 0x08 # Receiver can decrypt 
-CANLZW      = 0x10 # Receiver can uncompress 
-CANFC32     = 0x20 # Receiver can use 32 bit Frame Check 
-ESCCTL      = 0x40 # Receiver expects ctl chars to be escaped 
-ESC8        = 0x80 # Receiver expects 8th bit to be escaped 
+CANFDX      = 0x01
+CANOVIO     = 0x02
+CANBRK      = 0x04
+CANCRY      = 0x08
+CANLZW      = 0x10
+CANFC32     = 0x20
+ESCCTL      = 0x40
+ESC8        = 0x80
 
 # ZMODEM ZRINIT frame
-ZF0_CANFDX  = 0x01 # Receiver can send and receive true full duplex
-ZF0_CANOVIO = 0x02 # Receiver can receive data during disk I/O
-ZF0_CANBRK  = 0x04 # Receiver can send a break signal
-ZF0_CANCRY  = 0x08 # Receiver can decrypt DONT USE
-ZF0_CANLZW  = 0x10 # Receiver can uncompress DONT USE 
-ZF0_CANFC32 = 0x20 # Receiver can use 32 bit Frame Check
-ZF0_ESCCTL  = 0x40 # Receiver expects ctl chars to be escaped
-ZF0_ESC8    = 0x80 # Receiver expects 8th bit to be escaped
-ZF1_CANVHDR = 0x01 # Variable headers OK
+ZF0_CANFDX  = 0x01
+ZF0_CANOVIO = 0x02
+ZF0_CANBRK  = 0x04
+ZF0_CANCRY  = 0x08
+ZF0_CANLZW  = 0x10
+ZF0_CANFC32 = 0x20
+ZF0_ESCCTL  = 0x40
+ZF0_ESC8    = 0x80
+ZF1_CANVHDR = 0x01
 
 # ZMODEM ZSINIT frame
-ZF0_TESCCTL = 0x40 # Transmitter expects ctl chars to be escaped
-ZF0_TESC8   = 0x80 # Transmitter expects 8th bit to be escaped
+ZF0_TESCCTL = 0x40
+ZF0_TESC8   = 0x80
 
 # ZMODEM Byte positions within header array
 ZF0, ZF1, ZF2, ZF3 = range(4, 0, -1)
 ZP0, ZP1, ZP2, ZP3 = range(1, 5)
 
 # ZMODEM Frame contents
-ENDOFFRAME = 2
-FRAMEOK    = 1
-TIMEOUT    = -1     # rx routine did not receive a character within timeout
-INVHDR     = -2     # invalid header received; but within timeout
-INVDATA    = -3     # invalid data subpacket received
-ZDLEESC    = 0x8000 # one of ZCRCE; ZCRCG; ZCRCQ or ZCRCW was received; ZDLE escaped
+ENDOFFRAME  = 2
+FRAMEOK     = 1
+TIMEOUT     = -1      # Rx routine did not receive a character within timeout
+INVHDR      = -2      # Invalid header received; but within timeout
+INVDATA     = -3      # Invalid data subpacket received
+ZDLEESC     = 0x8000  # One of ZCRCE/ZCRCG/ZCRCQ/ZCRCW was ZDLE escaped
 
 # MODEM Protocol types
-PROTOCOL_XMODEM    = 0x00
-PROTOCOL_XMODEMCRC = 0x01
-PROTOCOL_XMODEM1K  = 0x02
-PROTOCOL_YMODEM    = 0x03
-PROTOCOL_ZMODEM    = 0x04
+PROTOCOL_XMODEM     = 0x00
+PROTOCOL_XMODEMCRC  = 0x01
+PROTOCOL_XMODEM1K   = 0x02
+PROTOCOL_YMODEM     = 0x03
+PROTOCOL_ZMODEM     = 0x04
 
 PACKET_SIZE = {
     PROTOCOL_XMODEM:    128,

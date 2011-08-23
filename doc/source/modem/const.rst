@@ -3,9 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Modem package
-=============
+Modem const module
+==================
 
-.. automodule:: modem
+Where indicated:
+
+:(X): ``XMODEM`` specific
+:(Y): ``YMODEM`` specific
+:(Z): ``ZMODEM`` specific
+
+.. automodule:: modem.const
    :members:
 

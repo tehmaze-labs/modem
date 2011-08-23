@@ -3,6 +3,10 @@ from modem.tools import crc16, crc32
 
 
 class Modem(object):
+    '''
+    Base modem class.
+    '''
+
     def __init__(self, getc, putc):
         self.getc = getc
         self.putc = putc

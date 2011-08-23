@@ -8,8 +8,8 @@ from modem.tools import log
 
 class ZMODEM(Modem):
     '''
-    ZMODEM protocol implementation, expects an object to read from and an object
-    to write to.
+    ZMODEM protocol implementation, expects an object to read from and an
+    object to write to.
     '''
 
     def recv(self, basedir, retry=16, timeout=60, delay=1):
@@ -220,7 +220,6 @@ class ZMODEM(Modem):
 
             # Spurious ZPAD check
             if char != ZDLE:
-                #print 'Did not get ZDLE %02x, but %s' % (char, global_str(char))
                 continue
 
             # Read header style

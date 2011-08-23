@@ -52,12 +52,10 @@ class XMODEMCRC(XMODEM):
                 self.abort(timeout=timeout)
                 return False
 
-
-        if not self._send_stream(stream, crc_mode, retry=retry, timeout=timeout):
+        if not self._send_stream(stream, crc_mode, retry, timeout):
             log.error(error.ABORT_SEND_STREAM)
             return False
         return True
-
 
     def recv(self, stream, crc_mode=1, retry=16, timeout=60, delay=1):
         '''
@@ -141,15 +139,15 @@ class XMODEMCRC(XMODEM):
             if seq1 == sequence and seq2 == sequence:
                 # Sequence is ok, read packet
                 # packet_size + checksum
-                data = self.getc(packet_size + 1 + crc_mode) 
-                data = self._check_crc(data,crc_mode,quiet=quiet,debug=debug)
+                data = self.getc(packet_size + 1 + crc_mode)
+                data = self._check_crc(data, crc_mode)
                 # valid data, append chunk
                 if data:
                     income_size += len(data)
                     stream.write(data)
                     self.putc(ACK)
                     sequence = (sequence + 1) % 0x100
-                    char = self.getc(1, timeout) 
+                    char = self.getc(1, timeout)
                     continue
             else:
                 # consume data

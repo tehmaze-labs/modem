@@ -1,5 +1,6 @@
-About modem
-===========
+=============
+ About modem
+=============
 
 This package ports the XMODEM, YMODEM and ZMODEM protocols to Python. We try to
 implement the protocols as minimalistic as possible without breaking the

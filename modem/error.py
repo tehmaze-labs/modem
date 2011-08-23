@@ -32,4 +32,5 @@ ERROR_PROTOCOL       = ERROR_WHY % _('protocol error')
 ERROR_SEND_EOT       = ERROR_WHY % _('failed sending <EOT>')
 ERROR_SEND_PACKET    = ERROR_WHY % _('failed to send packet')
 
-WARNS_SEQUENCE       = WARNS_WHY % _('invalid sequence; expected %02x got %02x/%02x')
+WARNS_SEQUENCE       = WARNS_WHY % \
+    _('invalid sequence; expected %02x got %02x/%02x')

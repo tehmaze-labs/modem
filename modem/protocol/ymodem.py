@@ -7,13 +7,11 @@ from modem.protocol.xmodem import XMODEM
 
 class YMODEM(XMODEM):
     '''
-    YMODEM protocol implementation, expects an object to read from and an object
-    to write to.
+    YMODEM protocol implementation, expects an object to read from and an
+    object to write to.
     '''
 
-    def __init__(self, getc, putc):
-        XMODEM.__init__(self,getc,putc)
-        self.VERSION=PROTOCOL_YMODEM
+    protocol = PROTOCOL_YMODEM
 
     def send(self, pattern, retry=16, timeout=60):
         '''
@@ -36,7 +34,7 @@ class YMODEM(XMODEM):
         crc_mode = 0
         start_char = self._wait_recv(error_count, timeout)
         if start_char:
-            crc_mode = 1 if ( start_char == CRC ) else 0 
+            crc_mode = 1 if (start_char == CRC) else 0
         else:
             log.error(error.ABORT_PROTOCOL)
             # Already aborted
@@ -66,23 +64,22 @@ class YMODEM(XMODEM):
                 return False
 
             # Wait for <CRC> before transmitting the file contents
-            error_count=0
+            error_count = 0
             if not self._wait_recv(error_count, timeout):
-                self.abort(timeout=timeout)
+                self.abort(timeout)
                 return False
 
             filedesc = open(filename, 'rb')
 
             # AT THIS POINT
             # - PACKET 0 WITH METADATA TRANSMITTED
-            # - INITIAL <CRC> OR <NAK> ALREADY RECEIVED 
+            # - INITIAL <CRC> OR <NAK> ALREADY RECEIVED
 
-            if not self._send_stream(filedesc, crc_mode, retry=retry,
-                timeout=timeout):
+            if not self._send_stream(filedesc, crc_mode, retry, timeout):
                 log.error(error.ABORT_SEND_STREAM)
                 return False
 
-            # AT THIS POINT  
+            # AT THIS POINT
             # - FILE CONTENTS TRANSMITTED
             # - <EOT> TRANSMITTED
             # - <ACK> RECEIVED
@@ -98,7 +95,7 @@ class YMODEM(XMODEM):
         # End of batch transmission, send NULL file name
         sequence = 0
         error_count = 0
-        packet_size= 128
+        packet_size = 128
         data = '\x00' * packet_size
         crc = self.calc_crc(data) if crc_mode else self.calc_checksum(data)
 
@@ -140,12 +137,12 @@ class YMODEM(XMODEM):
             elif crc_mode and error_count < (retry / 2):
                 if not self.putc(CRC):
                     time.sleep(delay)
-                    error_count +=1
+                    error_count += 1
             else:
                 crc_mode = 0
                 if not self.putc(NAK):
                     time.sleep(delay)
-                    error_count +=1
+                    error_count += 1
 
             # <CRC> or <NAK> sent, waiting answer
             char = self.getc(1, timeout)
@@ -196,11 +193,12 @@ class YMODEM(XMODEM):
                                 self.putc(ACK)
                                 return num_files
 
-                            log.info('Receiving %s to %s' % (filename, basedir))
+                            log.info('Receiving %s to %s' % (filename,
+                                basedir))
                             fileout = open(os.path.join(basedir,
                                 os.path.basename(filename)), 'wb')
 
-                            if not fileout: 
+                            if not fileout:
                                 log.error(error.ABORT_OPEN_FILE)
                                 self.putc(NAK)
                                 self.abort(timeout=timeout)
@@ -219,8 +217,7 @@ class YMODEM(XMODEM):
 
                 self.getc(packet_size + 1 + crc_mode)
                 self.putc(NAK)
-                self.getc(1,timeout)
-
+                self.getc(1, timeout)
 
             stream_size = self._recv_stream(fileout, crc_mode, retry, timeout,
                 delay)
@@ -236,4 +233,4 @@ class YMODEM(XMODEM):
 
             # Ask for the next sequence and receive the reply
             self.putc(CRC)
-            char = self.getc(1, timeout) 
+            char = self.getc(1, timeout)

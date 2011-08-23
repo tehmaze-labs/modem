@@ -7,8 +7,8 @@ from modem.tools import log
 
 class XMODEM(Modem):
     '''
-    XMODEM protocol implementation, expects an object to read from and an object
-    to write to.
+    XMODEM protocol implementation, expects an object to read from and an
+    object to write to.
 
     >>> def getc(size, timeout=1):
     ...     return data or None
@@ -212,11 +212,12 @@ class XMODEM(Modem):
             data = data.ljust(packet_size, '\x00')
 
             # Calculate CRC or checksum
-            crc = crc_mode and self.calc_crc16(data) or self.calc_checksum(data)
+            crc = crc_mode and self.calc_crc16(data) or \
+                self.calc_checksum(data)
 
             # SENDS PACKET WITH CRC
-            if not self._send_packet(sequence, data, packet_size, crc_mode, crc,
-                error_count, retry, timeout):
+            if not self._send_packet(sequence, data, packet_size, crc_mode,
+                crc, error_count, retry, timeout):
                 log.error(error.ERROR_SEND_PACKET)
                 return False
 
@@ -277,9 +278,10 @@ class XMODEM(Modem):
 
     def _send_eot(self, error_count, retry, timeout):
         '''
-        Sends an <EOT> code. It retries in case of errors and wait for the <ACK>
+        Sends an <EOT> code. It retries in case of errors and wait for the
+        <ACK>.
 
-        Return ``True`` on success, ``False`` in case of failure
+        Return ``True`` on success, ``False`` in case of failure.
         '''
         while True:
             self.putc(EOT)
@@ -288,7 +290,7 @@ class XMODEM(Modem):
             if char == ACK:
                 # <EOT> confirmed
                 return True
-            else :
+            else:
                 error_count += 1
                 if error_count >= retry:
                     # Excessive amounts of retransmissions requested,
@@ -361,7 +363,7 @@ class XMODEM(Modem):
                     return None
                 else:
                     cancel = 1
-            elif char in [SOH,STX]:
+            elif char in [SOH, STX]:
                 packet_size = 128 if char == SOH else 1024
                 # Check the requested packet size, only YMODEM has a variable
                 # size
@@ -375,8 +377,8 @@ class XMODEM(Modem):
                 seq2 = 0xff - ord(self.getc(1))
 
                 if seq1 == sequence and seq2 == sequence:
-                    data = self._check_crc(self.getc(packet_size + 1 + crc_mode),
-                        crc_mode)
+                    data = self.getc(packet_size + 1 + crc_mode)
+                    data = self._check_crc(data, crc_mode)
 
                     if data:
                         # Append data to the stream
