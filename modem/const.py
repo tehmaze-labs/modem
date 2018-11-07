@@ -279,110 +279,110 @@ ZMODEM ZSINIT frame
 
 '''
 
-SOH         = chr(0x01)
-STX         = chr(0x02)
-EOT         = chr(0x04)
-ACK         = chr(0x06)
-XON         = chr(0x11)
-XOFF        = chr(0x13)
-NAK         = chr(0x15)
-CAN         = chr(0x18)
-CRC         = chr(0x43)
+SOH = b'\x01'
+STX = b'\x02'
+EOT = b'\x04'
+ACK = b'\x06'
+XON = b'\x11'
+XOFF = b'\x13'
+NAK = b'\x15'
+CAN = b'\x18'
+CRC = b'\x43'
 
-TIMEOUT     = None
-ZPAD        = 0x2a
-ZDLE        = 0x18
-ZDLEE       = 0x58
-ZBIN        = 0x41
-ZHEX        = 0x42
-ZBIN32      = 0x43
-ZBINR32     = 0x44
-ZVBIN       = 0x61
-ZVHEX       = 0x62
-ZVBIN32     = 0x63
-ZVBINR32    = 0x64
-ZRESC       = 0x7e
+TIMEOUT = None
+ZPAD = 0x2a
+ZDLE = 0x18
+ZDLEE = 0x58
+ZBIN = 0x41
+ZHEX = 0x42
+ZBIN32 = 0x43
+ZBINR32 = 0x44
+ZVBIN = 0x61
+ZVHEX = 0x62
+ZVBIN32 = 0x63
+ZVBINR32 = 0x64
+ZRESC = 0x7e
 
 # ZMODEM Frame types
-ZRQINIT     = 0x00
-ZRINIT      = 0x01
-ZSINIT      = 0x02
-ZACK        = 0x03
-ZFILE       = 0x04
-ZSKIP       = 0x05
-ZNAK        = 0x06
-ZABORT      = 0x07
-ZFIN        = 0x08
-ZRPOS       = 0x09
-ZDATA       = 0x0a
-ZEOF        = 0x0b
-ZFERR       = 0x0c
-ZCRC        = 0x0d
-ZCHALLENGE  = 0x0e
-ZCOMPL      = 0x0f
-ZCAN        = 0x10
-ZFREECNT    = 0x11
-ZCOMMAND    = 0x12
-ZSTDERR     = 0x13
+ZRQINIT = 0x00
+ZRINIT = 0x01
+ZSINIT = 0x02
+ZACK = 0x03
+ZFILE = 0x04
+ZSKIP = 0x05
+ZNAK = 0x06
+ZABORT = 0x07
+ZFIN = 0x08
+ZRPOS = 0x09
+ZDATA = 0x0a
+ZEOF = 0x0b
+ZFERR = 0x0c
+ZCRC = 0x0d
+ZCHALLENGE = 0x0e
+ZCOMPL = 0x0f
+ZCAN = 0x10
+ZFREECNT = 0x11
+ZCOMMAND = 0x12
+ZSTDERR = 0x13
 
 # ZMODEM ZDLE sequences
-ZCRCE       = 0x68
-ZCRCG       = 0x69
-ZCRCQ       = 0x6a
-ZCRCW       = 0x6b
-ZRUB0       = 0x6c
-ZRUB1       = 0x6d
+ZCRCE = 0x68
+ZCRCG = 0x69
+ZCRCQ = 0x6a
+ZCRCW = 0x6b
+ZRUB0 = 0x6c
+ZRUB1 = 0x6d
 
 # ZMODEM Receiver capability flags
-CANFDX      = 0x01
-CANOVIO     = 0x02
-CANBRK      = 0x04
-CANCRY      = 0x08
-CANLZW      = 0x10
-CANFC32     = 0x20
-ESCCTL      = 0x40
-ESC8        = 0x80
+CANFDX = 0x01
+CANOVIO = 0x02
+CANBRK = 0x04
+CANCRY = 0x08
+CANLZW = 0x10
+CANFC32 = 0x20
+ESCCTL = 0x40
+ESC8 = 0x80
 
 # ZMODEM ZRINIT frame
-ZF0_CANFDX  = 0x01
+ZF0_CANFDX = 0x01
 ZF0_CANOVIO = 0x02
-ZF0_CANBRK  = 0x04
-ZF0_CANCRY  = 0x08
-ZF0_CANLZW  = 0x10
+ZF0_CANBRK = 0x04
+ZF0_CANCRY = 0x08
+ZF0_CANLZW = 0x10
 ZF0_CANFC32 = 0x20
-ZF0_ESCCTL  = 0x40
-ZF0_ESC8    = 0x80
+ZF0_ESCCTL = 0x40
+ZF0_ESC8 = 0x80
 ZF1_CANVHDR = 0x01
 
 # ZMODEM ZSINIT frame
 ZF0_TESCCTL = 0x40
-ZF0_TESC8   = 0x80
+ZF0_TESC8 = 0x80
 
 # ZMODEM Byte positions within header array
 ZF0, ZF1, ZF2, ZF3 = range(4, 0, -1)
 ZP0, ZP1, ZP2, ZP3 = range(1, 5)
 
 # ZMODEM Frame contents
-ENDOFFRAME  = 2
-FRAMEOK     = 1
-TIMEOUT     = -1      # Rx routine did not receive a character within timeout
-INVHDR      = -2      # Invalid header received; but within timeout
-INVDATA     = -3      # Invalid data subpacket received
-ZDLEESC     = 0x8000  # One of ZCRCE/ZCRCG/ZCRCQ/ZCRCW was ZDLE escaped
+ENDOFFRAME = 2
+FRAMEOK = 1
+TIMEOUT = -1      # Rx routine did not receive a character within timeout
+INVHDR = -2       # Invalid header received; but within timeout
+INVDATA = -3      # Invalid data subpacket received
+ZDLEESC = 0x8000  # One of ZCRCE/ZCRCG/ZCRCQ/ZCRCW was ZDLE escaped
 
 # MODEM Protocol types
-PROTOCOL_XMODEM     = 0x00
-PROTOCOL_XMODEMCRC  = 0x01
-PROTOCOL_XMODEM1K   = 0x02
-PROTOCOL_YMODEM     = 0x03
-PROTOCOL_ZMODEM     = 0x04
+PROTOCOL_XMODEM = 0x00
+PROTOCOL_XMODEMCRC = 0x01
+PROTOCOL_XMODEM1K = 0x02
+PROTOCOL_YMODEM = 0x03
+PROTOCOL_ZMODEM = 0x04
 
 PACKET_SIZE = {
-    PROTOCOL_XMODEM:    128,
+    PROTOCOL_XMODEM: 128,
     PROTOCOL_XMODEMCRC: 128,
-    PROTOCOL_XMODEM1K:  1024,
-    PROTOCOL_YMODEM:    1024,
-    PROTOCOL_ZMODEM:    1024,
+    PROTOCOL_XMODEM1K: 1024,
+    PROTOCOL_YMODEM: 1024,
+    PROTOCOL_ZMODEM: 1024,
 }
 
 # CRC tab calculated by Mark G. Mendel, Network Systems Corporation

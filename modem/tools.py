@@ -1,12 +1,16 @@
+import struct
 import logging
-from modem.const import CRC16_MAP, CRC32_MAP
 from zlib import crc32 as _crc32
+from modem.const import CRC16_MAP
+from collections.abc import Iterable
 
 
 # Configure logging
-logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+logging.basicConfig(
+    format='%(asctime)s [%(levelname)s] %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p',
-    level=logging.DEBUG)
+    level=logging.DEBUG
+)
 
 log = logging.getLogger('modem')
 
@@ -22,8 +26,20 @@ def crc16(data, crc=0):
         0x39db
 
     '''
-    for char in data:
-        crc = (crc << 8) ^ CRC16_MAP[((crc >> 0x08) ^ ord(char)) & 0xff]
+    def calc(byte, crc=0):
+        if isinstance(byte, bytes):
+            b = struct.unpack('B', byte)
+        else:
+            b = byte
+
+        crc = (crc << 8) ^ CRC16_MAP[((crc >> 0x08) ^ b) & 0xff]
+        return crc
+
+    if isinstance(data, Iterable):
+        for byte in data:
+            crc = calc(byte, crc)
+    else:
+        crc = calc(data, crc)
     return crc & 0xffff
 
 

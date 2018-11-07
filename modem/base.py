@@ -1,4 +1,3 @@
-from modem.const import CRC16_MAP, CRC32_MAP
 from modem.tools import crc16, crc32
 
 
@@ -29,14 +28,14 @@ class Modem(object):
         Calculate the 16 bit Cyclic Redundancy Check for a given block of data,
         can also be used to update a CRC.
 
-            >>> crc = modem.calc_crc16('hello')
-            >>> crc = modem.calc_crc16('world', crc)
+            >>> crc = modem.calc_crc16(b'hello')
+            >>> crc = modem.calc_crc16(b'world', crc)
             >>> hex(crc)
             '0xd5e3'
 
         '''
-        for char in data:
-            crc = crc16(char, crc)
+        for byte in data:
+            crc = crc16(byte, crc)
         return crc
 
     def calc_crc32(self, data, crc=0):
@@ -50,8 +49,8 @@ class Modem(object):
             '0x20ad'
 
         '''
-        for char in data:
-            crc = crc32(char, crc)
+        for byte in data:
+            crc = crc32(byte, crc)
         return crc
 
     def _check_crc(self, data, crc_mode):
@@ -68,13 +67,13 @@ class Modem(object):
         or returns False in case of invalid checksum/CRC
         '''
         if crc_mode:
-            csum = (ord(data[-2]) << 8) + ord(data[-1])
+            csum = (data[-2] << 8) + data[-1]
             data = data[:-2]
             mine = self.calc_crc16(data)
             if csum == mine:
                 return data
         else:
-            csum = ord(data[-3])
+            csum = data[-3]
             data = data[:-1]
             mine = self.calc_checksum(data)
             if csum == mine:
