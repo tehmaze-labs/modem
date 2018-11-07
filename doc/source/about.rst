@@ -1,4 +1,4 @@
-## 🎊🎉 This fork is target to run `modem` on Python3
+🎊🎉 This fork is target to run `modem` on Python3
 
 =============
  About modem
