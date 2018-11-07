@@ -1,4 +1,4 @@
-This branch have been port to Python3.7
+## 🎊🎉 This fork is target to run `modem` on Python3
 
 =============
  About modem
