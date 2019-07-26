@@ -216,8 +216,8 @@ class XMODEM(Modem):
             data = data.ljust(packet_size, b'\x00')
 
             # Calculate CRC or checksum
-            crc = crc_mode and self.calc_crc16(data) or \
-                self.calc_checksum(data)
+            if crc_mode == 1: crc = self.calc_crc16(data)
+            else: crc = self.calc_checksum(data)
 
             # SENDS PACKET WITH CRC
             if not self._send_packet(
