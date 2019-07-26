@@ -47,7 +47,7 @@ class YMODEM(XMODEM):
             sequence = 0
             error_count = 0
             # REQUIREMENT 1,1a,1b,1c,1d
-            data = ''.join([os.path.basename(filename), '\x00'])
+            data = ''.join([os.path.basename(filename), '\x00', str(os.path.getsize(filename))])
 
             log.debug(error.DEBUG_START_FILENAME % (filename,))
             # Pick a suitable packet length for the filename

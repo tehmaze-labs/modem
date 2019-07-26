@@ -236,7 +236,7 @@ class XMODEM(Modem):
                         int(50 * progress) * '=',
                         progress * 100,
                         int(50 * remain) * ' ',
-                    ), end='\r'
+                    ), end='\r', flush=True
                 )
 
         # STREAM FINISHED, SEND EOT
