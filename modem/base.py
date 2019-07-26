@@ -21,7 +21,7 @@ class Modem(object):
             '0x3c'
 
         '''
-        return (sum(map(ord, data)) + checksum) % 256
+        return (sum(map(lambda x: x, data)) + checksum) % 256
 
     def calc_crc16(self, data, crc=0):
         '''
