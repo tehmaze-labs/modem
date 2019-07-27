@@ -7,10 +7,11 @@ setup(
     author_email = 'maze@pyth0n.org',
     url          = 'https://maze.io/',
     description  = ('Modem implementations for XMODEM, YMODEM and ZMODEM'),
-    long_description = file('doc/source/about.rst').read(),
+    long_description = open('doc/source/about.rst').read(),
     license      = 'MIT',
     keywords     = 'xmodem ymodem zmodem protocol',
-    packages     = ['modem'],
+	package_dir  = {'modem.protocol' : 'modem/protocol' },
+    packages     = ['modem', 'modem.protocol'],
     package_data = {'': ['doc/*.TXT']},
 )
 
