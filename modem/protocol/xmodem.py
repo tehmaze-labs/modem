@@ -230,8 +230,8 @@ class XMODEM(Modem):
             sequence = (sequence + 1) % 0x100
             if filesize > 0:
                 total_sent += packet_size
-                progress = total_sent/filesize
-                remain = (filesize - total_sent)/filesize
+                progress = float(total_sent)/float(filesize)
+                remain = float(filesize - total_sent)/filesize
                 print(error.DEBUG_SEND_PROGRESS.format(
                         int(50 * progress) * '=',
                         progress * 100,
