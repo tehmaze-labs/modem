@@ -242,7 +242,7 @@ class XMODEM(Modem):
 
         print()
         # STREAM FINISHED, SEND EOT
-        log.debug(error.ERROR_SEND_EOT)
+        log.error(error.DEBUG_SEND_EOT)
         if self._send_eot(error_count, retry, timeout):
             return True
         else:
