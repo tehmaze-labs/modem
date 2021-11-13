@@ -2,6 +2,7 @@ import glob
 import os
 from modem.const import *
 from modem.tools import log
+from modem import error
 from modem.protocol.xmodem import XMODEM
 
 
@@ -45,9 +46,9 @@ class YMODEM(XMODEM):
             sequence = 0
             error_count = 0
             # REQUIREMENT 1,1a,1b,1c,1d
-            data = ''.join([os.path.basename(filename), '\x00'])
+            data = ''.join([os.path.basename(filename), '\x00', str(os.path.getsize(filename)), '\x00'])
 
-            log.debug(error.DEBUG_START_FILE % (filename,))
+            log.debug(error.DEBUG_START_FILENAME % (filename,))
             # Pick a suitable packet length for the filename
             packet_size = 128 if (len(data) < 128) else 1024
 
@@ -55,7 +56,7 @@ class YMODEM(XMODEM):
             data = data.ljust(packet_size, '\0')
 
             # Calculate checksum
-            crc = self.calc_crc(data) if crc_mode else self.calc_checksum(data)
+            crc = self.calc_crc16(data) if crc_mode else self.calc_checksum(data)
 
             # Emit packet
             if not self._send_packet(sequence, data, packet_size, crc_mode,
@@ -70,12 +71,13 @@ class YMODEM(XMODEM):
                 return False
 
             filedesc = open(filename, 'rb')
+            filesize = os.path.getsize(filename)
 
             # AT THIS POINT
             # - PACKET 0 WITH METADATA TRANSMITTED
             # - INITIAL <CRC> OR <NAK> ALREADY RECEIVED
 
-            if not self._send_stream(filedesc, crc_mode, retry, timeout):
+            if not self._send_stream(filedesc, crc_mode, retry, timeout, filesize):
                 log.error(error.ABORT_SEND_STREAM)
                 return False
 
@@ -97,7 +99,7 @@ class YMODEM(XMODEM):
         error_count = 0
         packet_size = 128
         data = '\x00' * packet_size
-        crc = self.calc_crc(data) if crc_mode else self.calc_checksum(data)
+        crc = self.calc_crc16(data) if crc_mode else self.calc_checksum(data)
 
         # Emit packet
         if not self._send_packet(sequence, data, packet_size, crc_mode, crc,

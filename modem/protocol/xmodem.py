@@ -1,4 +1,6 @@
+from __future__ import print_function
 import time
+import sys
 from modem import error
 from modem.base import Modem
 from modem.const import *
@@ -179,7 +181,7 @@ class XMODEM(Modem):
             # something went wrong, request retransmission
             self.putc(NAK)
 
-    def _send_stream(self, stream, crc_mode, retry=16, timeout=0):
+    def _send_stream(self, stream, crc_mode, retry=16, timeout=0, filesize=0.0):
         '''
         Sends a stream according to the given protocol dialect:
 
@@ -197,6 +199,7 @@ class XMODEM(Modem):
         # SO START DIRECTLY WITH STREAM TRANSMISSION
         sequence = 1
         error_count = 0
+        total_sent = 0
 
         while True:
             data = stream.read(packet_size)
@@ -212,8 +215,8 @@ class XMODEM(Modem):
             data = data.ljust(packet_size, '\x00')
 
             # Calculate CRC or checksum
-            crc = crc_mode and self.calc_crc16(data) or \
-                self.calc_checksum(data)
+            if crc_mode == 1: crc = self.calc_crc16(data)
+            else: crc = self.calc_checksum(data)
 
             # SENDS PACKET WITH CRC
             if not self._send_packet(sequence, data, packet_size, crc_mode,
@@ -223,9 +226,21 @@ class XMODEM(Modem):
 
             # Next sequence
             sequence = (sequence + 1) % 0x100
+            if filesize > 0:
+                total_sent += packet_size
+                progress = total_sent/filesize
+                remain = (filesize - total_sent)/filesize
+                print(error.DEBUG_SEND_PROGRESS.format(
+                        int(50 * progress) * '=',
+                        progress * 100,
+                        int(50 * remain) * ' ',
+                    ), end='\r'
+                )
+                sys.stdout.flush()
 
+        print()
         # STREAM FINISHED, SEND EOT
-        log.debug(error.DEBUG_SEND_EOT)
+        log.debug(error.ERROR_SEND_EOT)
         if self._send_eot(error_count, retry, timeout):
             return True
         else:
@@ -308,6 +323,7 @@ class XMODEM(Modem):
         cancel = 0
         # Loop until the first character is a control character (NAK, CRC) or
         # we reach the retry limit
+        retry = 16
         while True:
             char = self.getc(1)
             if char:
