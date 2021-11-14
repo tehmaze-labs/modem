@@ -25,6 +25,14 @@ class XMODEM(Modem):
     # Protocol identifier
     protocol = const.PROTOCOL_XMODEM
 
+    def __init__(self, getc, putc):
+        Modem.__init__(self, getc, putc)
+        self.progress = 0
+        return
+
+    def get_progress(self):
+        return self.progress
+
     def abort(self, count=2, timeout=60):
         '''
         Send an abort sequence using CAN bytes.
@@ -230,15 +238,15 @@ class XMODEM(Modem):
             sequence = (sequence + 1) % 0x100
             if filesize > 0:
                 total_sent += packet_size
-                progress = float(total_sent)/float(filesize)
-                remain = float(filesize - total_sent)/filesize
-                print(error.DEBUG_SEND_PROGRESS.format(
-                        int(50 * progress) * '=',
-                        progress * 100,
-                        int(50 * remain) * ' ',
-                    ), end='\r'
-                )
-                sys.stdout.flush()
+                self.progress = float(total_sent)/float(filesize)
+                # remain = float(filesize - total_sent)/filesize
+                # print(error.DEBUG_SEND_PROGRESS.format(
+                #         int(50 * self.progress) * '=',
+                #         self.progress * 100,
+                #         int(50 * remain) * ' ',
+                #     ), end='\r'
+                # )
+                # sys.stdout.flush()
 
         print()
         # STREAM FINISHED, SEND EOT

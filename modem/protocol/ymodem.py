@@ -1,6 +1,7 @@
 import glob
 import os
 import time
+from threading import Thread
 from modem import const
 from modem.tools import log
 from modem.protocol.xmodem import XMODEM
@@ -14,6 +15,11 @@ class YMODEM(XMODEM):
     '''
 
     protocol = const.PROTOCOL_YMODEM
+
+    def __init__(self, getc, putc):
+        XMODEM.__init__(self, getc, putc)
+        self.thread = None
+        return
 
     def send(self, pattern, retry=16, timeout=60):
         '''
@@ -116,6 +122,20 @@ class YMODEM(XMODEM):
 
         # All went fine
         return True
+
+    def send_threaded(self, pattern, retry=16, timeout=60):
+        if self.thread == None:
+            self.thread = Thread(target=self.send, args=(pattern, retry, timeout,))
+            self.thread.daemon = True
+            self.thread.start()
+        return
+
+    def send_join(self):
+        self.thread.join()
+        return
+
+    def get_progress(self):
+        return XMODEM.get_progress(self)
 
     def recv(self, basedir, crc_mode=1, retry=16, timeout=60, delay=1):
         '''
