@@ -321,7 +321,7 @@ class XMODEM(Modem):
         '''
         # Initialize protocol
         cancel = 0
-        retry = 2
+        retry = 10
         # Loop until the first character is a control character (NAK, CRC) or
         # we reach the retry limit
         while True:
@@ -398,6 +398,8 @@ class XMODEM(Modem):
 
                     if data:
                         # Append data to the stream
+                        if self.file_size != None and income_size + len(data) > self.file_size:
+                            data = data[0:(self.file_size - income_size)]
                         income_size += len(data)
                         stream.write(data)
                         self.putc(const.ACK)
