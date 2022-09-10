@@ -9,6 +9,10 @@ class Modem(object):
     def __init__(self, getc, putc):
         self.getc = getc
         self.putc = putc
+        self.file_size = None
+
+    def _set_file_size(self, file_size):
+        self.file_size = file_size
 
     def calc_checksum(self, data, checksum=0):
         '''

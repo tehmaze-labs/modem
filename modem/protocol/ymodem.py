@@ -196,14 +196,17 @@ class YMODEM(XMODEM):
                         data = self.getc(packet_size + 1 + crc_mode)
                         data = self._check_crc(data, crc_mode)
                         if data:
-                            filename = data.split('\x00')[0]
+                            metadata = data.decode("utf-8").split('\x00')
+                            filename = metadata[0]
                             if not filename:
                                 # No filename, end of batch reception
                                 self.putc(const.ACK)
                                 return num_files
 
-                            log.info('Receiving %s to %s' %
-                                     (filename, basedir))
+                            file_size = int(metadata[1])
+                            self._set_file_size(file_size)
+                            log.info('Receiving %s to %s, %d bytes' %
+                                     (filename, basedir, file_size))
                             fileout = open(os.path.join(
                                 basedir, os.path.basename(filename)), 'wb')
 
