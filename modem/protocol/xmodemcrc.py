@@ -1,5 +1,8 @@
+import time
+
 from modem import error
-from modem.const import *
+from modem import const
+from modem.tools import log
 from modem.protocol.xmodem import XMODEM
 
 
@@ -10,7 +13,7 @@ class XMODEMCRC(XMODEM):
     '''
 
     # Protocol identifier
-    protocol = PROTOCOL_XMODEMCRC
+    protocol = const.PROTOCOL_XMODEMCRC
 
     def send(self, stream, retry=16, timeout=60):
         '''
@@ -29,15 +32,15 @@ class XMODEMCRC(XMODEM):
         crc_mode = 0
         cancel = 0
         while True:
-            char = self.getc(1)
-            if char:
-                if char == NAK:
+            byte = self.getc(1)
+            if byte:
+                if byte == const.NAK:
                     crc_mode = 0
                     break
-                elif char == CRC:
+                elif byte == const.CRC:
                     crc_mode = 1
                     break
-                elif char == CAN:
+                elif byte == const.CAN:
                     if cancel:
                         log.error(error.ABORT_RECV_CAN_CAN)
                         return False
@@ -45,7 +48,7 @@ class XMODEMCRC(XMODEM):
                         log.debug(error.DEBUG_RECV_CAN)
                         cancel = 1
                 else:
-                    log.error(error.ABORT_EXPECT_NAK_CRC % ord(char))
+                    log.error(error.ABORT_EXPECT_NAK_CRC % byte.hex())
 
             error_count += 1
             if error_count >= retry:
@@ -71,7 +74,7 @@ class XMODEMCRC(XMODEM):
 
         # initiate protocol
         error_count = 0
-        char = 0
+        byte = 0
         cancel = 0
         while True:
             # first try CRC mode, if this fails,
@@ -81,22 +84,22 @@ class XMODEMCRC(XMODEM):
                 self.abort(timeout=timeout)
                 return None
             elif crc_mode and error_count < (retry / 2):
-                if not self.putc(CRC):
+                if not self.putc(const.CRC):
                     time.sleep(delay)
                     error_count += 1
             else:
                 crc_mode = 0
-                if not self.putc(NAK):
+                if not self.putc(const.NAK):
                     time.sleep(delay)
                     error_count += 1
 
-            char = self.getc(1, timeout)
-            if char is None:
+            byte = self.getc(1, timeout)
+            if byte is None:
                 error_count += 1
                 continue
-            elif char == SOH:
+            elif byte == const.SOH:
                 break
-            elif char == CAN:
+            elif byte == const.CAN:
                 if cancel:
                     return None
                 else:
@@ -112,20 +115,20 @@ class XMODEMCRC(XMODEM):
         cancel = 0
         while True:
             while True:
-                if char == SOH:
+                if byte == const.SOH:
                     break
-                elif char == EOT:
+                elif byte == const.EOT:
                     # SEND LAST <ACK>
-                    self.putc(ACK)
+                    self.putc(const.ACK)
                     return income_size
-                elif char == CAN:
+                elif byte == const.CAN:
                     # Cancel at two consecutive <CAN> bytes
                     if cancel:
                         return None
                     else:
                         cancel = 1
                 else:
-                    log.error(error.ABORT_EXPECT_SOH_EOT % ord(char))
+                    log.error(error.ABORT_EXPECT_SOH_EOT % byte.hex())
                     error_count += 1
                     if error_count >= retry:
                         self.abort()
@@ -145,9 +148,9 @@ class XMODEMCRC(XMODEM):
                 if data:
                     income_size += len(data)
                     stream.write(data)
-                    self.putc(ACK)
+                    self.putc(const.ACK)
                     sequence = (sequence + 1) % 0x100
-                    char = self.getc(1, timeout)
+                    byte = self.getc(1, timeout)
                     continue
             else:
                 # consume data
@@ -155,4 +158,4 @@ class XMODEMCRC(XMODEM):
                 log.error(error.ABORT_INVALID_SEQ)
 
             # something went wrong, request retransmission
-            self.putc(NAK)
+            self.putc(const.NAK)
